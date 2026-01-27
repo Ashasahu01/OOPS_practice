@@ -1,37 +1,45 @@
-#include<iostream>
+#include <iostream>
 using namespace std;
 
-class Distance{
-    float mtr, cm;
+class Distance
+{
 
 public:
+    int mtr, cm;
     void input()
     {
-    cout << "Enter meter and centimeters: ";
-    cin >> mtr >> cm;
+        cout << "Enter meter and centimeters: ";
+        cin >> mtr >> cm;
     }
 
     void display()
     {
-        cout << "Distance:- " << mtr << "m" << cm <<"cm.";
-    }
-
-    Distance add(Distance d){
-        //addition logic
+        cout << mtr << "m" << cm << "cm.";
     }
 };
 
-int main(){
-    Distance d1, d2, d3;
+Distance add(Distance d1, Distance d2)
+{
+    // addition logic
+    Distance d3;
+    d3.cm = (d1.cm + d2.cm) % 100;
+    d3.mtr = (d1.cm + d2.cm) / 100 + d1.mtr + d2.mtr;
+    cout << d3.mtr << d3.cm;
+    return d3;
+}
+
+int main()
+{
+    Distance D1, D2, D3;
 
     cout << "Enter first and second distance: \n";
-    d1.input();
-    d2.input();
+    D1.input();
+    D2.input();
 
-    d3 = d1.add(d2);
+    D3 = add(D1, D2);
 
     cout << "Distance is :- ";
-    d3.display();
+    D3.display();
 
     return 0;
 }
