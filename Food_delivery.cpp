@@ -1,88 +1,173 @@
 #include <iostream>
+#include <iomanip>
+#include <stdexcept>   // for exception handling
 using namespace std;
-// class for food item 
-class FoodItem {
-private:
+
+enum Category { VEG, NONVEG, DRINK };
+
+class Item {
+protected:
     int id;
     string name;
     double price;
+    static int count;
 
 public:
-    // overriding Default Constructor
-    FoodItem() {
-        id = 0;
-        name = "None";
-        price = 0;
-    }
+    Item(int i = 0, string n = "None", double p = 0.0) {
 
-    // Parameterized Constructor
-    FoodItem(int i, string n, double p) {
+        // Exception for invalid ID
+        if(i < 0)
+            throw invalid_argument("Item ID cannot be negative");
+
+        // Exception for invalid price
+        if(p < 0)
+            throw invalid_argument("Price cannot be negative");
+
         id = i;
         name = n;
         price = p;
+        count++;
     }
 
-    void display() {
-        cout << id << "  " << name << "  ₹" << price << endl;
+    double operator+(Item &obj) {
+        double total = this->price + obj.price;
+
+        // Exception if bill too large
+        if(total > 10000)
+            throw overflow_error("Bill amount too large");
+
+        return total;
     }
 
-    double getPrice() {
-        return price;
+    bool operator==(Item &obj) {
+        return this->price == obj.price;
     }
+
+    friend ostream& operator<<(ostream &out, Item &obj);
+
+    inline double getPrice() { return price; }
+
+    virtual void display() {
+        cout << "ID: " << id << " Name: " << name
+             << " Price: ₹" << fixed << setprecision(2) << price << endl;
+    }
+
+    static void showCount() {
+        cout << "Total items created: " << count << endl;
+    }
+
+    friend void applyDiscount(Item &obj);
+
+    virtual ~Item() {}
 };
 
-// class for ordering item
+int Item::count = 0;
 
-class Order {
-private:
-// using different class objects as data member
-    FoodItem item1, item2;
-    double total;
+class FoodItem : public Item {
+    Category type;
 
 public:
-    // Default Constructor
-    Order() {
-        total = 0;
-    }
+    FoodItem(int i, string n, double p, Category t)
+        : Item(i, n, p), type(t) {}
 
-    // Function Overloading (addItem)
-    void addItem(FoodItem f) {
-        item1 = f;
-        total += f.getPrice();
-    }
-
-    void addItem(FoodItem f1, FoodItem f2) {
-        item1 = f1;
-        item2 = f2;
-        total += f1.getPrice() + f2.getPrice();
-    }
-
-    void showBill() {
-        cout << "\nTotal Bill: ₹" << total << endl;
-    }
-
-    // Destructor
-    ~Order() {
-        cout << "\nOrder completed. Thank you!\n";
+    void display() override {
+        cout << "[FOOD] ";
+        Item::display();
     }
 };
+
+class DrinkItem : public Item {
+public:
+    DrinkItem(int i, string n, double p)
+        : Item(i, n, p) {}
+
+    void display() override {
+        cout << "[DRINK] ";
+        Item::display();
+    }
+};
+
+void applyDiscount(Item &obj) {
+
+    if(obj.price <= 0)
+        throw runtime_error("Cannot apply discount on invalid price");
+
+    obj.price = obj.price * 0.9;
+}
+
+double calculateBill(double a) {
+    return a;
+}
+
+double calculateBill(double a, double b) {
+    return a + b;
+}
+
+double& increasePrice(double &p) {
+
+    if(p < 0)
+        throw runtime_error("Price cannot be negative");
+
+    p += 20;
+    return p;
+}
+
+ostream& operator<<(ostream &o, Item &obj) {
+    o << "ID: " << obj.id
+      << " Name: " << obj.name
+      << " Price: ₹" << fixed << setprecision(2) << obj.price;
+    return o;
+}
 
 int main() {
 
-    FoodItem f1(1, "Pizza", 250);
-    FoodItem f2(2, "Burger", 120);
+    try {
 
-    cout << "Menu:\n";
-    f1.display();
-    f2.display();
+        Item *ptr1 = new FoodItem(1, "Pizza", 250, VEG);
+        Item *ptr2 = new FoodItem(2, "Burger", 180, NONVEG);
+        Item *ptr3 = new DrinkItem(3, "Coke", 60);
 
-    Order o1;
+        cout << "\n--- Menu ---\n";
+        ptr1->display();
+        ptr2->display();
+        ptr3->display();
 
-    // Using overloaded functions
-    o1.addItem(f1);
-    o1.addItem(f1, f2);
+        double total = *ptr1 + *ptr2;
+        cout << "\nTotal Bill using Operator + : ₹" << total << endl;
 
-    o1.showBill();
+        if (*ptr1 == *ptr2)
+            cout << "Both items have same price\n";
+        else
+            cout << "Items have different prices\n";
+
+        cout << "\nPrinting Item using << operator:\n";
+        cout << *ptr1 << endl;
+
+        applyDiscount(*ptr1);
+
+        cout << "\nAfter Discount on Pizza:\n";
+        ptr1->display();
+
+        Item::showCount();
+
+        delete ptr1;
+        delete ptr2;
+        delete ptr3;
+    }
+
+    // Catch specific exceptions
+    catch(invalid_argument &e) {
+        cout << "Invalid Argument Exception: " << e.what() << endl;
+    }
+    catch(overflow_error &e) {
+        cout << "Overflow Exception: " << e.what() << endl;
+    }
+    catch(runtime_error &e) {
+        cout << "Runtime Exception: " << e.what() << endl;
+    }
+    catch(...) {
+        cout << "Unknown Exception occurred!" << endl;
+    }
 
     return 0;
 }
