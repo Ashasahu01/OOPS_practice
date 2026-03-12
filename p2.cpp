@@ -27,7 +27,7 @@ void employee ::putdata(void)
 const int size = 3;
 int main()
 {
-    employee manager[size];
+    employee manager[size];  //array of object
     for (int i = 0; i < size; i++)
     {
         cout << "\nDetails of manager" << i + 1 << "\n";
