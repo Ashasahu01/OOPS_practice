@@ -1,6 +1,6 @@
-// import java.util.Scanner;
+// 
 package LabWork;
-
+import java.util.Scanner;
 public class L2_1 {
     
 	public static void main(String[] args) {
