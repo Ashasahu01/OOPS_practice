@@ -127,7 +127,7 @@ public class Pair {
 //q7
 public class SecondLargest {
     public static void main(String[] args) {
-        int[] arr = {15, 55, 55, 28, 0};
+        int[] arr = {15, 55, 55, 28, 0}; 
 
         int first = Integer.MIN_VALUE;
         int second = Integer.MIN_VALUE;
@@ -136,7 +136,8 @@ public class SecondLargest {
             if(num > first) {
                 second = first;
                 first = num;
-            } else if(num > second && num != first) {
+            } 
+            else if(num > second && num != first) { //check if the num is greater than second or not also checks if the num is not similar to first larger number
                 second = num;
             }
         }
